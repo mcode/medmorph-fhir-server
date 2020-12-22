@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  medmorph_ehr:
+    image: medmorph_ehr
+    container_name: medmorph_ehr
+    restart: on-failure
+    ports:
+      - "8080:8080"

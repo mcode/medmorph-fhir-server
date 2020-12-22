@@ -160,7 +160,7 @@ public class JpaRestfulServer extends RestfulServer {
     /*
      * Add Authorization interceptor
      */
-    PatientAuthorizationInterceptor authorizationInterceptor = new PatientAuthorizationInterceptor();
+    BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor();
     this.registerInterceptor(authorizationInterceptor);
 
     /*

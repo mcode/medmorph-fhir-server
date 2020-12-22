@@ -29,7 +29,7 @@ import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 
 @SuppressWarnings("ConstantConditions")
-public class PatientAuthorizationInterceptor extends AuthorizationInterceptor {
+public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
 
     @Override
     public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {

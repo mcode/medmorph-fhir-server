@@ -28,9 +28,9 @@ docker-compose up
 ```
 
 The server will then be browseable at
-[http://localhost:8080](http://localhost:8080), and the
+[http://localhost:8080/medmorph](http://localhost:8080/medmorph), and the
 server's FHIR endpoint will be available at
-[http://localhost:8080/fhir](http://localhost:8080/fhir)
+[http://localhost:8080/medmorph/fhir](http://localhost:8080/medmorph/fhir)
 
 # Authorization
 

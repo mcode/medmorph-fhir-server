@@ -13,7 +13,6 @@ import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
 import ca.uhn.fhir.jpa.provider.GraphQLProvider;
 import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 import ca.uhn.fhir.jpa.provider.TerminologyUploaderProvider;
-import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
 import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
 import ca.uhn.fhir.jpa.provider.r5.JpaConformanceProviderR5;
 import ca.uhn.fhir.jpa.provider.r5.JpaSystemProviderR5;
@@ -99,12 +98,7 @@ public class JpaRestfulServer extends RestfulServer {
      * to provide further customization of your server's CapabilityStatement
      */
     if (fhirVersion == FhirVersionEnum.R4) {
-      IFhirSystemDao<org.hl7.fhir.r4.model.Bundle, org.hl7.fhir.r4.model.Meta> systemDao = appCtx
-          .getBean("mySystemDaoR4", IFhirSystemDao.class);
-      JpaConformanceProviderR4 confProvider = new JpaConformanceProviderR4(this, systemDao,
-          appCtx.getBean(DaoConfig.class));
-      confProvider.setImplementationDescription("HAPI FHIR R4 Server");
-      setServerConformanceProvider(confProvider);
+      setServerConformanceProvider(new Metadata());
     } else if (fhirVersion == FhirVersionEnum.R5) {
       IFhirSystemDao<org.hl7.fhir.r5.model.Bundle, org.hl7.fhir.r5.model.Meta> systemDao = appCtx
           .getBean("mySystemDaoR5", IFhirSystemDao.class);
@@ -162,6 +156,12 @@ public class JpaRestfulServer extends RestfulServer {
     loggingInterceptor.setErrorMessageFormat(HapiProperties.getLoggerErrorFormat());
     loggingInterceptor.setLogExceptions(HapiProperties.getLoggerLogExceptions());
     this.registerInterceptor(loggingInterceptor);
+
+    /*
+     * Add Authorization interceptor
+     */
+    BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor();
+    this.registerInterceptor(authorizationInterceptor);
 
     /*
      * If you are hosting this server at a specific DNS name, the server will try to

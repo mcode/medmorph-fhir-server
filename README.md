@@ -50,7 +50,7 @@ An instance of the EHR and Knowledge Artifact Repository is running on `pathways
 | Service                      | Base URL                            |
 | ---------------------------- | ----------------------------------- |
 | EHR                          | http://pathways.mitre.org:8180/fhir |
-| Knowldge Artifact Repository | http://pathways.mitre.org/8190/fhir |
+| Knowldge Artifact Repository | http://pathways.mitre.org:8190/fhir |
 
 ## Steps to Update
 

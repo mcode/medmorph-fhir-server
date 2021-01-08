@@ -25,7 +25,7 @@ This will build the docker image for the reference server. Once the image has
 been built, the server can be run with the following command:
 
 ```
-docker run -p 8080:8080 medmorph_fhir -e AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/ SERVER_ADDRESS=http://localhost:8080/fhir/
+docker run -p 8080:8080 medmorph_fhir -e AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/ -e SERVER_ADDRESS=http://localhost:8080/fhir/
 ```
 
 The server will then be browseable at
@@ -35,7 +35,7 @@ server's FHIR endpoint will be available at
 
 # Configuration
 
-Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS` and `SERVER_ADDRESS`. These are set through enviornment variables of the same names. Using compose will automatically create all necessary servers.
+Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, and `SERVER_TITLE`. These are set through enviornment variables of the same names. Using compose will automatically create all necessary servers.
 
 # Authorization
 

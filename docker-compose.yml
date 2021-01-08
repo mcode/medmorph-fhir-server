@@ -10,6 +10,7 @@ services:
     environment:
       - SERVER_ADDRESS=http://localhost:8080/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
+      - SERVER_TITLE='MedMorph EHR'
   knowledge_artifact:
     image: medmorph_fhir
     container_name: knowledge_artifact
@@ -19,3 +20,4 @@ services:
     environment:
       - SERVER_ADDRESS=http://localhost:8090/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
+      - SERVER_TITLE='Knowledge Artifact Repository'

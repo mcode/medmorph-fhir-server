@@ -21,13 +21,13 @@ public class Metadata extends ServerCapabilityStatementProvider {
     @Override
     public CapabilityStatement getServerConformance(HttpServletRequest request, RequestDetails requestDetails) {
         CapabilityStatement c = super.getServerConformance(request, requestDetails);
-        c.setTitle("MedMorph EHR");
+        c.setTitle(getTitle());
         c.setExperimental(true);
         c.setPublisher("MITRE");
         c.addImplementationGuide("https://build.fhir.org/ig/HL7/fhir-medmorph/index.html");
 
         CapabilityStatementSoftwareComponent software = new CapabilityStatementSoftwareComponent();
-        software.setName("https://github.com/mcode/medmorph-ehr");
+        software.setName("https://github.com/mcode/medmorph-fhir-server");
         c.setSoftware(software);
 
         CapabilityStatementRestSecurityComponent securityComponent = new CapabilityStatementRestSecurityComponent();
@@ -56,6 +56,18 @@ public class Metadata extends ServerCapabilityStatementProvider {
             rest.setSecurity(securityComponent);
 
         return c;
+    }
+
+    private String getTitle() {
+        String title = "MedMorph FHIR Server";
+        try {
+            String envTitle = System.getenv("SERVER_TITLE");
+            if (envTitle != null) return envTitle;
+        } catch (NullPointerException | SecurityException e) {
+            e.printStackTrace();
+        }
+
+        return title; 
     }
     
 }

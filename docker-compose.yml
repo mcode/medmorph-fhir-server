@@ -8,8 +8,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SERVER_ADDRESS=http://localhost:8080/medmorph/fhir/
-      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/medmorph/protocol/openid-connect/
+      - SERVER_ADDRESS=http://localhost:8080/fhir/
+      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
   knowledge_artifact:
     image: medmorph_fhir
     container_name: knowledge_artifact
@@ -17,5 +17,5 @@ services:
     ports:
       - "8090:8080"
     environment:
-      - SERVER_ADDRESS=http://localhost:8090/medmorph/fhir/
-      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/medmorph/protocol/openid-connect/
+      - SERVER_ADDRESS=http://localhost:8090/fhir/
+      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/

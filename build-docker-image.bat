@@ -1,1 +1,1 @@
-docker build -t medmorph_ehr .
+docker build -t medmorph_fhir .

@@ -9,7 +9,7 @@ Note: Issues related to performance and Subscriptions were observed on HAPI 5.1.
 The easiest way to run this server is to use docker.
 
 ```
-./build-docker-image.sh
+./build-docker-image.bat
 docker-compose up
 ```
 

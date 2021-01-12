@@ -42,28 +42,3 @@ Since this is a single repository and single docker image for multiple actors, e
 This server is protected by the SMART Backend Authentication protocol. The admin token is `admin`. The OAuth URLS can be found at the `/metadata` or `/.well-known/smart-configuration` endpoints.
 
 Follow the [Register New Client](https://github.com/mcode/medmorph-fhir-server/wiki/Register-New-Client) wiki page to register a new client.
-
-# Hosted Server
-
-An instance of the EHR and Knowledge Artifact Repository is running on `pathways.mitre.org`.
-
-| Service                      | Base URL                            |
-| ---------------------------- | ----------------------------------- |
-| EHR                          | http://pathways.mitre.org:8180/fhir |
-| Knowldge Artifact Repository | http://pathways.mitre.org:8190/fhir |
-
-## Steps to Update
-
-The service will not automatically deploy when changes are made. To update the services:
-
-```
-[localhost] $ git push
-[localhost] $ ssh pathways.mitre.org
-[pathways.mitre.org] $ cd /opt/medmorph-fhir-server
-[pathways.mitre.org] $ git pull
-[pathways.mitre.org] $ docker-compose down
-[pathways.mitre.org] $ ./build-docker-image.bat
-[pathways.mitre.org] $ docker-compose up -d
-```
-
-Before running the last command you can optionally modify the urls and ports in the `docker-compose.yml` file.

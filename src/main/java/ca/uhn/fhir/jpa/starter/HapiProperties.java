@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class HapiProperties {
   static final String ENABLE_INDEX_MISSING_FIELDS = "enable_index_missing_fields";
-    static final String AUTH_SERVER_ADDRESS = "auth_server_address";
+    static final String AUTH_SERVER_ADDRESS = "AUTH_SERVER_ADDRESS";
     static final String AUTO_CREATE_PLACEHOLDER_REFERENCE_TARGETS = "auto_create_placeholder_reference_targets";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE = "enforce_referential_integrity_on_write";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_DELETE = "enforce_referential_integrity_on_delete";
@@ -50,7 +50,7 @@ public class HapiProperties {
     static final String LOGGER_NAME = "logger.name";
     static final String MAX_FETCH_SIZE = "max_fetch_size";
     static final String MAX_PAGE_SIZE = "max_page_size";
-    static final String SERVER_ADDRESS = "server_address";
+    static final String SERVER_ADDRESS = "SERVER_ADDRESS";
     static final String SERVER_ID = "server.id";
     static final String SERVER_NAME = "server.name";
     static final String SUBSCRIPTION_EMAIL_ENABLED = "subscription.email.enabled";
@@ -251,15 +251,15 @@ public class HapiProperties {
     }
 
     public static String getServerAddress() {
-        return HapiProperties.getProperty(SERVER_ADDRESS);
+        return System.getenv(SERVER_ADDRESS);
     }
 
     public static String getAuthServerTokenAddress() {
-        return HapiProperties.getProperty(AUTH_SERVER_ADDRESS) + "token";
+        return System.getenv(AUTH_SERVER_ADDRESS) + "token";
     }
 
     public static String getAuthServerCertsAddress() {
-        return HapiProperties.getProperty(AUTH_SERVER_ADDRESS) + "certs";
+        return System.getenv(AUTH_SERVER_ADDRESS) + "certs";
     }
 
     public static Integer getDefaultPageSize() {

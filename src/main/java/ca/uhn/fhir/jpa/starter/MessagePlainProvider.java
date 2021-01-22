@@ -1,11 +1,12 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.dao.IFhirResourceDao;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -14,6 +15,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.MessageHeader;
+import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
@@ -23,13 +25,20 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-public class MyPlainProvider {
+public class MessagePlainProvider {
+  DaoRegistry daoRegistry;
+  FhirContext fhirContext;
+  public MessagePlainProvider(DaoRegistry _daoRegistry, FhirContext _fhirContext){
+    daoRegistry = _daoRegistry;
+    fhirContext = _fhirContext;
+  }
   @Operation(name="$process-message")
   public IBaseResource processMessage(
       @OptionalParam(name="async") String async,
       @OptionalParam(name="response-url") String responseUrl,
       @ResourceParam Bundle bundleR4
   ) {
+
     // validate the bundle
     if (bundleR4.getType() != Bundle.BundleType.MESSAGE) {
       OperationOutcome oo = new OperationOutcome();
@@ -74,9 +83,11 @@ public class MyPlainProvider {
       return oo;
     }
 
+    IFhirResourceDao bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
+    bundleDao.create(bundleR4);
 
-    System.out.println(async);
-    if (async.equals("true")) {
+
+    if (async != null && async.equals("true")) {
       // asynchronous
       String asyncResponseUrl;
       if (responseUrl != null) {
@@ -86,10 +97,9 @@ public class MyPlainProvider {
       }
       // do any async operations in the new thread
       Thread newThread = new Thread(() -> {
-        MessageHeader.ResponseType responseType = doEvent(msgHead);
+        ResponseType responseType = doEvent(msgHead);
         Bundle bundle = buildResponseMessage(msgHead, responseType);
-        FhirContext ctx = FhirContext.forR4();
-        IParser parser = ctx.newJsonParser();
+        IParser parser = fhirContext.newJsonParser();
         String bundleString = parser.encodeResourceToString(bundle);
         makePost(asyncResponseUrl, bundleString);
       });
@@ -102,7 +112,7 @@ public class MyPlainProvider {
 
     } else {
       // synchronous
-      MessageHeader.ResponseType responseType = doEvent(msgHead);
+      ResponseType responseType = doEvent(msgHead);
       return buildResponseMessage(msgHead, responseType);
     }
   }
@@ -123,7 +133,7 @@ public class MyPlainProvider {
       e.printStackTrace();
     }
   }
-  private MessageHeader.ResponseType doEvent(MessageHeader msgHead) {
+  private ResponseType doEvent(MessageHeader msgHead) {
     // TODO: this function should synchronously
     // complete whatever event the message has asked for
     // The "focus" list is a list of reference resources
@@ -134,12 +144,12 @@ public class MyPlainProvider {
     } else if (msgHead.hasEventUriType()) {
       String uri = msgHead.getEventUriType().fhirType();
     }
-    return MessageHeader.ResponseType.OK;
+    return ResponseType.OK;
   }
 
 
 
-  private Bundle buildResponseMessage(MessageHeader requestHeader, MessageHeader.ResponseType responseType) {
+  private Bundle buildResponseMessage(MessageHeader requestHeader, ResponseType responseType) {
     String serverAddress = HapiProperties.getServerAddress();
     Bundle response = new Bundle();
     response.setType(Bundle.BundleType.MESSAGE);

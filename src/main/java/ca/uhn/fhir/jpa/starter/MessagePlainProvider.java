@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -32,12 +33,14 @@ public class MessagePlainProvider {
     daoRegistry = _daoRegistry;
     fhirContext = _fhirContext;
   }
-  @Operation(name="$process-message")
-  public IBaseResource processMessage(
+  @Operation(name="$process-message", manualResponse=true)
+  public void processMessage(
       @OptionalParam(name="async") String async,
       @OptionalParam(name="response-url") String responseUrl,
-      @ResourceParam Bundle bundleR4
+      @ResourceParam Bundle bundleR4,
+      HttpServletResponse theServletResponse
   ) {
+    IParser parser = fhirContext.newJsonParser();
 
     // validate the bundle
     if (bundleR4.getType() != Bundle.BundleType.MESSAGE) {
@@ -45,7 +48,7 @@ public class MessagePlainProvider {
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("Bundle is not of type 'message'");
-      return oo;
+      respondWithResource(oo, theServletResponse, parser);
     }
 
     if (!bundleR4.hasEntry()) {
@@ -53,7 +56,7 @@ public class MessagePlainProvider {
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("Bundle has no entries, a MessageHeader is required");
-      return oo;
+      respondWithResource(oo, theServletResponse, parser);
     }
 
     // check that there is a message header
@@ -63,7 +66,7 @@ public class MessagePlainProvider {
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("First resource in message bundle must be of type 'MessageHeader'");
-      return oo;
+      respondWithResource(oo, theServletResponse, parser);
     }
 
     MessageHeader msgHead = (MessageHeader) firstResource;
@@ -74,17 +77,20 @@ public class MessagePlainProvider {
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("'MessageHeader' is missing source");
-      return oo;
+      respondWithResource(oo, theServletResponse, parser);
     } else if (!msgHead.getSource().hasEndpoint()){
       OperationOutcome oo = new OperationOutcome();
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("'MessageHeader.source' is missing an endpoint");
-      return oo;
+      respondWithResource(oo, theServletResponse, parser);
     }
 
+    // use the DAO to create resources in the fhir server
     IFhirResourceDao bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
+    IFhirResourceDao messageDao = daoRegistry.getResourceDao(ResourceType.MessageHeader.name());
     bundleDao.create(bundleR4);
+    messageDao.create(msgHead);
 
 
     if (async != null && async.equals("true")) {
@@ -99,21 +105,22 @@ public class MessagePlainProvider {
       Thread newThread = new Thread(() -> {
         ResponseType responseType = doEvent(msgHead);
         Bundle bundle = buildResponseMessage(msgHead, responseType);
-        IParser parser = fhirContext.newJsonParser();
         String bundleString = parser.encodeResourceToString(bundle);
         makePost(asyncResponseUrl, bundleString);
       });
       newThread.start();
-      OperationOutcome oo = new OperationOutcome();
-      oo.addIssue()
-          .setSeverity(OperationOutcome.IssueSeverity.INFORMATION)
-          .setDiagnostics("Asynchronous message successfully received");
-      return oo;
+      theServletResponse.setStatus(200);
+      try {
+        theServletResponse.getWriter().close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
 
     } else {
       // synchronous
       ResponseType responseType = doEvent(msgHead);
-      return buildResponseMessage(msgHead, responseType);
+      Bundle bundle = buildResponseMessage(msgHead, responseType);
+      respondWithResource(bundle, theServletResponse, parser);
     }
   }
 
@@ -148,6 +155,17 @@ public class MessagePlainProvider {
   }
 
 
+  private void respondWithResource(IBaseResource resource, HttpServletResponse theServletResponse, IParser parser ){
+    theServletResponse.setContentType("application/json");
+    try {
+      String data = parser.encodeResourceToString(resource);
+      theServletResponse.getWriter().write(data);
+      theServletResponse.getWriter().close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
 
   private Bundle buildResponseMessage(MessageHeader requestHeader, ResponseType responseType) {
     String serverAddress = HapiProperties.getServerAddress();

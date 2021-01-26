@@ -49,6 +49,7 @@ public class MessagePlainProvider {
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("Bundle is not of type 'message'");
       respondWithResource(oo, theServletResponse, parser);
+      return;
     }
 
     if (!bundleR4.hasEntry()) {
@@ -57,6 +58,7 @@ public class MessagePlainProvider {
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("Bundle has no entries, a MessageHeader is required");
       respondWithResource(oo, theServletResponse, parser);
+      return;
     }
 
     // check that there is a message header
@@ -67,6 +69,7 @@ public class MessagePlainProvider {
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("First resource in message bundle must be of type 'MessageHeader'");
       respondWithResource(oo, theServletResponse, parser);
+      return;
     }
 
     MessageHeader msgHead = (MessageHeader) firstResource;
@@ -78,12 +81,14 @@ public class MessagePlainProvider {
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("'MessageHeader' is missing source");
       respondWithResource(oo, theServletResponse, parser);
+      return;
     } else if (!msgHead.getSource().hasEndpoint()){
       OperationOutcome oo = new OperationOutcome();
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("'MessageHeader.source' is missing an endpoint");
       respondWithResource(oo, theServletResponse, parser);
+      return;
     }
 
     // use the DAO to create resources in the fhir server
@@ -115,12 +120,13 @@ public class MessagePlainProvider {
       } catch (IOException e) {
         e.printStackTrace();
       }
-
+      return;
     } else {
       // synchronous
       ResponseType responseType = doEvent(msgHead);
       Bundle bundle = buildResponseMessage(msgHead, responseType);
       respondWithResource(bundle, theServletResponse, parser);
+      return;
     }
   }
 

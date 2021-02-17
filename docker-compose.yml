@@ -8,7 +8,7 @@ services:
     ports:
       - "8180:8080"
     environment:
-      - SERVER_ADDRESS=https://localhost:8440/fhir/
+      - SERVER_ADDRESS=https://pathways.mitre.org:8440/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
       - SERVER_TITLE=MedMorph EHR
   knowledge_artifact:
@@ -18,7 +18,7 @@ services:
     ports:
       - "8190:8080"
     environment:
-      - SERVER_ADDRESS=https://localhost:8550/fhir/
+      - SERVER_ADDRESS=https://pathways.mitre.org:8550/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
       - SERVER_TITLE=Knowledge Artifact Repository
   public_health_authority:
@@ -28,6 +28,6 @@ services:
     ports:
       - "8181:8080"
     environment:
-      - SERVER_ADDRESS=https://localhost:8660/fhir/
+      - SERVER_ADDRESS=https://pathways.mitre.org:8660/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/pha/protocol/openid-connect/
       - SERVER_TITLE=Public Health Authority

@@ -63,7 +63,7 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                         e.printStackTrace();
                         throw new AuthenticationException("Internal error processing public key", e);
-					}
+                    }
                 }
 
             }

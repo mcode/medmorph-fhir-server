@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -12,15 +13,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.keycloak.TokenVerifier;
-import org.keycloak.common.VerificationException;
-import org.keycloak.representations.AccessToken;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -49,16 +52,18 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
                     return authorizedRule();
                 else {
                     try {
-                        TokenVerifier<AccessToken> verifier = TokenVerifier.create(token, AccessToken.class).publicKey(getKey());
-                        verifier.verify();
+                        verify(token);
                         return authorizedRule();
-                    } catch (VerificationException e) {
+                    } catch (TokenExpiredException e) {
+                        e.printStackTrace();
+                        throw new AuthenticationException("Token is expired", e);
+                    } catch (JWTVerificationException e) {
                         e.printStackTrace();
                         throw new AuthenticationException("Token is invalid", e);
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                         e.printStackTrace();
                         throw new AuthenticationException("Internal error processing public key", e);
-                    }
+					}
                 }
 
             }
@@ -104,4 +109,55 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
         RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(n, e);
         return (RSAPublicKey) kf.generatePublic(publicKeySpec);
     }
+
+    /**
+     * Verify the access token signature and expiration
+     * @param token - the access token
+     * @return true if signature is valid and token has not expired, otherwise throws an exception
+     * @throws ParseException
+     */
+    private boolean verify(String token) throws IllegalArgumentException, NoSuchAlgorithmException, InvalidKeySpecException, TokenExpiredException, JWTVerificationException {
+        Algorithm algorithm = getAlgorithm(token, getKey());
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        verifier.verify(token);
+
+        return true;
+    }
+
+    private Algorithm getAlgorithm(String token, Object publicKey) {
+        // Decode the header of the token
+        String header = token.split("\\.")[0];
+        byte[] decodedBytes = Base64.getDecoder().decode(header);
+        String decodedHeader = new String(decodedBytes);
+
+        // Get the alg
+        JSONObject headerJSON = new JSONObject(decodedHeader);
+        String alg = headerJSON.getString("alg");
+
+        switch(alg) {
+            case "HS256":
+                return Algorithm.HMAC256((String) publicKey);
+            case "HS384":
+                return Algorithm.HMAC384((String) publicKey);
+            case "HS512":
+                return Algorithm.HMAC512((String) publicKey);
+            case "RS256":
+                return Algorithm.RSA256((RSAPublicKey) publicKey, null);
+            case "RS384":
+                return Algorithm.RSA384((RSAPublicKey) publicKey, null);
+            case "RS512":
+                return Algorithm.RSA512((RSAPublicKey) publicKey, null);
+            case "ES256":
+                return Algorithm.ECDSA256((ECPublicKey) publicKey, null);
+            case "ES384":
+                return Algorithm.ECDSA384((ECPublicKey) publicKey, null);
+            case "ES512":
+                return Algorithm.ECDSA512((ECPublicKey) publicKey, null);
+            case "PS256":
+            case "PS384":
+            default:
+                return null;
+        }
+    }
+
 }

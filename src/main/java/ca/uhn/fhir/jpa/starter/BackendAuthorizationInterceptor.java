@@ -124,7 +124,7 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
         return true;
     }
 
-    private Algorithm getAlgorithm(String token, Object publicKey) {
+    private Algorithm getAlgorithm(String token, Object publicKey) throws NoSuchAlgorithmException {
         // Decode the header of the token
         String header = token.split("\\.")[0];
         byte[] decodedBytes = Base64.getDecoder().decode(header);
@@ -156,7 +156,7 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
             case "PS256":
             case "PS384":
             default:
-                return null;
+                throw new NoSuchAlgorithmException("Algorithm is not supported by this library.");
         }
     }
 

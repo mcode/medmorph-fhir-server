@@ -63,6 +63,9 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                         e.printStackTrace();
                         throw new AuthenticationException("Internal error processing public key", e);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new AuthenticationException("Unable to authorize token", e);
                     }
                 }
 

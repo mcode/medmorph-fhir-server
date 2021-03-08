@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter;
+package org.mitre.hapifhir;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,10 @@ public class Metadata extends ServerCapabilityStatementProvider {
 
         CapabilityStatementRestSecurityComponent securityComponent = new CapabilityStatementRestSecurityComponent();
         Extension oauthExtension = new Extension();
-        Extension tokenEndpointUri = new Extension("token", new UriType(HapiProperties.getAuthServerTokenAddress()));
+        
+        // TODO: refactor to not use HapiProperties
+        String tokenAddress = "http://example.com"; // HapiProperties.getAuthServerTokenAddress()
+        Extension tokenEndpointUri = new Extension("token", new UriType(tokenAddress));
         oauthExtension.setUrl("http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
         oauthExtension.setExtension(Collections.singletonList(tokenEndpointUri));
         securityComponent.addExtension(oauthExtension);

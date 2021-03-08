@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter.wellknown;
+package org.mitre.hapifhir;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import ca.uhn.fhir.jpa.starter.HapiProperties;
 
 @RestController
 public class WellKnownEndpointController {
@@ -31,7 +29,9 @@ public class WellKnownEndpointController {
     public String getWellKnownJson(HttpServletRequest theRequest) {
 
         JSONObject wellKnownJson = new JSONObject();
-        wellKnownJson.put(WELL_KNOWN_TOKEN_ENDPOINT_KEY, HapiProperties.getAuthServerTokenAddress());
+        
+        // TODO: refactor to not use HapiProperties -- it's a JPA starter server file
+        wellKnownJson.put(WELL_KNOWN_TOKEN_ENDPOINT_KEY, "http://example.com"); //HapiProperties.getAuthServerTokenAddress());
 
         return wellKnownJson.toString(2);
     }

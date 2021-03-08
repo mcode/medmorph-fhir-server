@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter;
+package org.mitre.hapifhir;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,7 +31,6 @@ import ca.uhn.fhir.rest.server.interceptor.auth.AuthorizationInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 
-@SuppressWarnings("ConstantConditions")
 public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
 
     @Override
@@ -94,7 +93,10 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
         // Get the latest key from the auth server
 		try {
             OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(HapiProperties.getAuthServerCertsAddress()).build();
+            
+            // TODO: refactor to remove HapiProperties
+            String certsAddress = "http://example.com"; // HapiProperties.getAuthServerCertsAddress();
+            Request request = new Request.Builder().url(certsAddress).build();
             Response response = client.newCall(request).execute();
             JSONObject jwks = new JSONObject(response.body().string());
             JSONArray keys = jwks.getJSONArray("keys");

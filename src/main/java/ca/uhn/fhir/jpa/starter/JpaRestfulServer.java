@@ -39,8 +39,9 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent;
 import org.mitre.hapifhir.BackendAuthorizationInterceptor;
-import org.mitre.hapifhir.Metadata;
+import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
 import org.mitre.hapifhir.ProcessMessageProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -120,8 +121,19 @@ public class JpaRestfulServer extends RestfulServer {
     
     registerProvider(pmp);
 
+    registerProvider(new WellknownEndpointController());
+    
     registerProviders(resourceProviders.createProviders());
     registerProvider(systemProvider);
+
+    String title = "MedMorph FHIR Server";
+    try {
+        String envTitle = System.getenv("SERVER_TITLE");
+        if (envTitle != null) title = envTitle;
+    } catch (NullPointerException | SecurityException e) {
+    	System.err.println("Error getting server title: ");
+        e.printStackTrace();
+    }
 
     /*
      * The conformance provider exports the supported resources, search parameters,
@@ -132,7 +144,24 @@ public class JpaRestfulServer extends RestfulServer {
      * to provide further customization of your server's CapabilityStatement
      */
     if (fhirVersion == FhirVersionEnum.R4) {
-      setServerConformanceProvider(new Metadata());
+      SMARTServerCapabilityStatementProvider smartCSProvider =
+    			new SMARTServerCapabilityStatementProvider(HapiProperties.getAuthServerTokenAddress());
+
+      final String serverTitle = title;
+      
+      smartCSProvider
+      	.with(c -> c.setTitle(serverTitle))
+      	.with(c -> c.setExperimental(true))
+      	.with(c -> c.setPublisher("MITRE"))
+      	.with(c -> c.addImplementationGuide("https://build.fhir.org/ig/HL7/fhir-medmorph/index.html"))
+      	.with(c -> {
+          CapabilityStatementSoftwareComponent software = new CapabilityStatementSoftwareComponent();
+          software.setName("https://github.com/mcode/medmorph-fhir-server");
+          c.setSoftware(software);
+      	});
+
+
+      setServerConformanceProvider(smartCSProvider);
     } else if (fhirVersion == FhirVersionEnum.R5) {
       IFhirSystemDao<org.hl7.fhir.r5.model.Bundle, org.hl7.fhir.r5.model.Meta> systemDao = appCtx
           .getBean("mySystemDaoR5", IFhirSystemDao.class);
@@ -194,7 +223,7 @@ public class JpaRestfulServer extends RestfulServer {
     /*
      * Add Authorization interceptor
      */
-    BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor();
+    BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
     this.registerInterceptor(authorizationInterceptor);
 
     /*

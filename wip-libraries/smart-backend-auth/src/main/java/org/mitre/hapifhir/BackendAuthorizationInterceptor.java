@@ -33,6 +33,13 @@ import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 
 public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
 
+	private String authServerCertsAddress;
+	
+	public BackendAuthorizationInterceptor(String authServerCertsAddress) {
+		super();
+		this.authServerCertsAddress = authServerCertsAddress;
+	}
+	
     @Override
     public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
 
@@ -93,10 +100,7 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
         // Get the latest key from the auth server
 		try {
             OkHttpClient client = new OkHttpClient();
-            
-            // TODO: refactor to remove HapiProperties
-            String certsAddress = "http://example.com"; // HapiProperties.getAuthServerCertsAddress();
-            Request request = new Request.Builder().url(certsAddress).build();
+            Request request = new Request.Builder().url(authServerCertsAddress).build();
             Response response = client.newCall(request).execute();
             JSONObject jwks = new JSONObject(response.body().string());
             JSONArray keys = jwks.getJSONArray("keys");

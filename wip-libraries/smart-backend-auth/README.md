@@ -38,7 +38,8 @@ For example, using a JPA Starter HAPI FHIR Server:
 
 ```java
 
-import org.mitre.hapifhir.ProcessMessageProvider;
+import org.mitre.hapifhir.BackendAuthorizationInterceptor;
+import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
 
 ...
 
@@ -51,6 +52,11 @@ public class JpaRestfulServer extends RestfulServer {
       new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
     this.registerInterceptor(authorizationInterceptor);
     ...
+
+    SMARTServerCapabilityStatementProvider smartCSProvider =
+        new SMARTServerCapabilityStatementProvider(HapiProperties.getAuthServerTokenAddress());
+
+    setServerConformanceProvider(smartCSProvider);
   }
 }
 

@@ -6,14 +6,18 @@ Note: Issues related to performance and Subscriptions were observed on HAPI 5.1.
 
 # Running Locally
 
-The easiest way to run this server is to use docker.
+The easiest way to run this server is to use docker.  If using docker-for-windows or docker-for-mac, make sure the docker machine is allocated enough memory to run all three FHIR servers.  The three containers together require approximately 2.5GB of memory.
+
+By default, docker on windows/mac will only allocate 2GB of local memory for docker containers.  To change this, use the Docker GUI, accessed through the docker toolbar icon or app, and navigate to preferences.  Open the resources/advanced tab and increase the memory from 2GB to at least 3GB.  This should provide the fhir servers with enough memory to run properly.
+
+Then, run the following commands:
 
 ```
 ./build-docker-image.bat
 docker-compose up
 ```
 
-This will create the `medmorph_fhir` image and spin up the `medmoprh_ehr` (on [http://localhost:8080/fhir](http://localhost:8080/fhir)) and `knowledge_artifact` (on [http://localhost:8090/fhir](http://localhost:8090/fhir)) containers.
+This will create the `medmorph_fhir` image and spin up the `medmoprh_ehr` (on [http://localhost:8180/fhir](http://localhost:8180/fhir)), `knowledge_artifact` (on [http://localhost:8190/fhir](http://localhost:8190/fhir)), and `public_health_authority` (on [http://localhost:8181/fhir](http://localhost:8181/fhir)) containers.
 
 Alternatively the image can be built and specific instances run. First, clone this repository. Then, from the repository root run:
 

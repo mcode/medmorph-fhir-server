@@ -9,6 +9,7 @@
 
 plugins {
     id 'java-library'
+    id 'checkstyle'
     id 'maven-publish'
 }
 
@@ -30,6 +31,11 @@ repositories {
     // }
 }
 
+checkstyle {
+  toolVersion '8.4'
+  //showViolations = true
+}
+
 dependencies {
 
 	// dependencies list is intentionally kept minimal for this
@@ -41,9 +47,6 @@ dependencies {
     api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:4.1.0'
     
     api 'javax.servlet:javax.servlet-api:3.1.0'
-    
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    //implementation 'com.google.guava:guava:29.0-jre'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'

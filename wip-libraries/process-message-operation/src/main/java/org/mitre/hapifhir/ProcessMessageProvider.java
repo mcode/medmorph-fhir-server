@@ -1,11 +1,16 @@
 package org.mitre.hapifhir;
 
 import ca.uhn.fhir.context.FhirContext;
-
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.function.BiFunction;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -18,17 +23,14 @@ import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.function.BiFunction;
 
 public class ProcessMessageProvider {
 
   private FhirContext fhirContext;
   private BiFunction<Bundle, MessageHeader, Bundle> action;
   
-  public ProcessMessageProvider(FhirContext fhirContext, BiFunction<Bundle, MessageHeader, Bundle> action){
+  public ProcessMessageProvider(FhirContext fhirContext, 
+      BiFunction<Bundle, MessageHeader, Bundle> action) {
     this.fhirContext = fhirContext;
     this.action = action;
   }
@@ -70,7 +72,7 @@ public class ProcessMessageProvider {
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
           .setDiagnostics("'MessageHeader' is missing source");
       return oo;
-    } else if (!msgHead.getSource().hasEndpoint()){
+    } else if (!msgHead.getSource().hasEndpoint()) {
       OperationOutcome oo = new OperationOutcome();
       oo.addIssue()
           .setSeverity(OperationOutcome.IssueSeverity.ERROR)
@@ -83,10 +85,10 @@ public class ProcessMessageProvider {
   }
   
   
-  @Operation(name="$process-message", manualResponse=true)
+  @Operation(name = "$process-message", manualResponse = true)
   public void processMessage(
-      @OptionalParam(name="async") String async,
-      @OptionalParam(name="response-url") String responseUrl,
+      @OptionalParam(name = "async") String async,
+      @OptionalParam(name = "response-url") String responseUrl,
       @ResourceParam Bundle bundleR4,
       HttpServletResponse theServletResponse
   ) {
@@ -145,8 +147,8 @@ public class ProcessMessageProvider {
     }
   }
 
-
-  private void respondWithResource(IBaseResource resource, HttpServletResponse theServletResponse, IParser parser){
+  private void respondWithResource(IBaseResource resource,
+      HttpServletResponse theServletResponse, IParser parser) {
     theServletResponse.setContentType("application/json");
     try {
       String data = parser.encodeResourceToString(resource);

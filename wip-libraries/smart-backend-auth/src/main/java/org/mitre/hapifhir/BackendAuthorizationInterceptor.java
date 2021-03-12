@@ -93,23 +93,16 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
         return new RuleBuilder().allow().metadata().andThen().denyAll().build();
     }
 
-    private RSAPublicKey getKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String eRaw = "AQAB";
-        String nRaw = "obB80r5GR3Zx5tPXEb2NYI3itp6xI-XAr2kly4xbkcmLweWDouIXxCkamFPEjo-Fb7gfnM-2_u8wV3Rzg5Z8IpIJh3hJy6XV0DH_rFIVQMtyMX-NaNvOxMQRoohVAXKpluw14-lmH5Y90sX_k7lK3JR5WlPcv9RKRFWWW8ePxrzOqFt0Jvi8mgCETFEG4259oVWPgD4SDI3zrTLkZ30-Dw1VDwDBXCTkZUK8LoWqavecPXMERHa10XnCqZXOntAIzrMXd3XzAvw2iOmdHytB--RP_zsLnEJZdqq2T5Q1WNbkPqSWEKUkPJ_WuAHtxppZnFKFGX-VmytD3rLWhAQXWw";
-
+    private RSAPublicKey getKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         // Get the latest key from the auth server
-		try {
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(authServerCertsAddress).build();
-            Response response = client.newCall(request).execute();
-            JSONObject jwks = new JSONObject(response.body().string());
-            JSONArray keys = jwks.getJSONArray("keys");
-            JSONObject key = (JSONObject) keys.get(0);
-            eRaw = key.getString("e");
-            nRaw = key.getString("n");
-		} catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(authServerCertsAddress).build();
+        Response response = client.newCall(request).execute();
+        JSONObject jwks = new JSONObject(response.body().string());
+        JSONArray keys = jwks.getJSONArray("keys");
+        JSONObject key = (JSONObject) keys.get(0);
+        String eRaw = key.getString("e");
+        String nRaw = key.getString("n");
 
         BigInteger e = new BigInteger(1, Base64.getUrlDecoder().decode(eRaw));
         BigInteger n = new BigInteger(1, Base64.getUrlDecoder().decode(nRaw));
@@ -125,7 +118,8 @@ public class BackendAuthorizationInterceptor extends AuthorizationInterceptor {
      * @return true if signature is valid and token has not expired, otherwise throws an exception
      * @throws ParseException
      */
-    private boolean verify(String token) throws IllegalArgumentException, NoSuchAlgorithmException, InvalidKeySpecException, TokenExpiredException, JWTVerificationException {
+    private boolean verify(String token) throws IllegalArgumentException, NoSuchAlgorithmException,
+        InvalidKeySpecException, TokenExpiredException, JWTVerificationException, IOException {
         Algorithm algorithm = getAlgorithm(token, getKey());
         JWTVerifier verifier = JWT.require(algorithm).build();
         verifier.verify(token);

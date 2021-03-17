@@ -120,8 +120,6 @@ public class JpaRestfulServer extends RestfulServer {
     });
     
     registerProvider(pmp);
-
-    registerProvider(new WellknownEndpointController());
     
     registerProviders(resourceProviders.createProviders());
     registerProvider(systemProvider);

@@ -1,25 +1,13 @@
-package ca.uhn.fhir.jpa.starter.wellknown;
+package ca.uhn.fhir.jpa.starter;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import org.json.JSONObject;
+import org.mitre.hapifhir.WellknownEndpointHelper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.uhn.fhir.jpa.starter.HapiProperties;
-
 @RestController
-public class WellKnownEndpointController {
-
-    // Well Known JSON Keys
-    private static final String WELL_KNOWN_TOKEN_ENDPOINT_KEY = "token_endpoint";
-
-    @PostConstruct
-    protected void postConstruct() {
-        System.out.println("Well Known controller added.");
-    }
-
+public class WellknownEndpointController {
     /**
      * Get request to support well-known endpoints for authorization metadata. See
      * http://www.hl7.org/fhir/smart-app-launch/conformance/index.html#using-well-known
@@ -29,10 +17,8 @@ public class WellKnownEndpointController {
      */
     @GetMapping(path = "/smart-configuration", produces = {"application/json"})
     public String getWellKnownJson(HttpServletRequest theRequest) {
-
-        JSONObject wellKnownJson = new JSONObject();
-        wellKnownJson.put(WELL_KNOWN_TOKEN_ENDPOINT_KEY, HapiProperties.getAuthServerTokenAddress());
-
-        return wellKnownJson.toString(2);
+    	String yourTokenUrl = HapiProperties.getAuthServerTokenAddress();
+    	
+    	return WellknownEndpointHelper.getWellKnownJson(yourTokenUrl);
     }
 }

@@ -6,9 +6,11 @@ Note: Issues related to performance and Subscriptions were observed on HAPI 5.1.
 
 # Running Locally
 
-The easiest way to run this server is to use docker.  If using docker-for-windows or docker-for-mac, make sure the docker machine is allocated enough memory to run all three FHIR servers.  The three containers together require approximately 2.5GB of memory.
+## Docker
 
-By default, docker on windows/mac will only allocate 2GB of local memory for docker containers.  To change this, use the Docker GUI, accessed through the docker toolbar icon or app, and navigate to preferences.  Open the resources/advanced tab and increase the memory from 2GB to at least 3GB.  This should provide the fhir servers with enough memory to run properly.
+The easiest way to run this server is to use docker. If using docker-for-windows or docker-for-mac, make sure the docker machine is allocated enough memory to run all three FHIR servers. The three containers together require approximately 2.5GB of memory.
+
+By default, docker on windows/mac will only allocate 2GB of local memory for docker containers. To change this, use the Docker GUI, accessed through the docker toolbar icon or app, and navigate to preferences. Open the resources/advanced tab and increase the memory from 2GB to at least 3GB. This should provide the fhir servers with enough memory to run properly.
 
 Then, run the following commands:
 
@@ -36,6 +38,31 @@ The server will then be browseable at
 [http://localhost:8080](http://localhost:8080), and the
 server's FHIR endpoint will be available at
 [http://localhost:8080/fhir](http://localhost:8080/fhir)
+
+## Jetty
+
+Alternatively the server can be run without Docker. When testing changes published to a local maven repository you must use this approach. This requires exporting the environment variables manually
+
+```
+export SERVER_ADDRESS=http://localhost:8080/medmorph/fhir
+export AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
+export SERVER_TITLE=Medmorph
+export ADMIN_TOKEN=admin
+```
+
+Then run the server using
+
+```
+mvn jetty:run
+```
+
+Note: this has only been tested with Java 8, if you are using a different version of Java and experience issues try switching to Java 8.
+Note: a common error is about `.m2/repositories/com/h2database`. This is most likely due to running the server with a different version of Java. If you encounter this issue verify you are using Java 8, delete the `h2database` folder and run the server again.
+
+The server will then be browseable at
+[http://localhost:8080/medmorph](http://localhost:8080/medmorph), and the
+server's FHIR endpoint will be available at
+[http://localhost:8080/medmorph/fhir](http://localhost:8080/medmorph/fhir)
 
 # Configuration
 

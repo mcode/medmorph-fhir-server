@@ -39,7 +39,7 @@ server's FHIR endpoint will be available at
 
 # Configuration
 
-Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, and `SERVER_TITLE`. These are set through enviornment variables of the same names. Using compose will automatically create all necessary servers.
+Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, and `ADMIN_TOKEN`. These are set through enviornment variables of the same names. Using compose will automatically create all necessary servers.
 
 # Authorization
 
@@ -47,8 +47,8 @@ This server is protected by the SMART Backend Authentication protocol. The admin
 
 Follow the [Register New Client](https://github.com/mcode/medmorph-fhir-server/wiki/Register-New-Client) wiki page to register a new client.
 
-
 # License
+
 Copyright 2021 The MITRE Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");

@@ -6,10 +6,10 @@ services:
     container_name: medmorph_ehr
     restart: on-failure
     ports:
-      - "8180:8080"
+      - "8080:8080"
     environment:
-      - SERVER_ADDRESS=https://pathways.mitre.org:8440/fhir/
-      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
+      - SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8080
+      - AUTH_SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8090/auth/realms/ehr/protocol/openid-connect/
       - SERVER_TITLE=MedMorph EHR
       - ADMIN_TOKEN=admin
   knowledge_artifact:
@@ -17,10 +17,10 @@ services:
     container_name: knowledge_artifact
     restart: on-failure
     ports:
-      - "8190:8080"
+      - "8081:8080"
     environment:
-      - SERVER_ADDRESS=https://pathways.mitre.org:8550/fhir/
-      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
+      - SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8081
+      - AUTH_SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
       - SERVER_TITLE=Knowledge Artifact Repository
       - ADMIN_TOKEN=admin
   public_health_authority:
@@ -28,9 +28,9 @@ services:
     container_name: public_health_authority
     restart: on-failure
     ports:
-      - "8181:8080"
+      - "8082:8080"
     environment:
-      - SERVER_ADDRESS=https://pathways.mitre.org:8660/fhir/
-      - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/pha/protocol/openid-connect/
+      - SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8082
+      - AUTH_SERVER_ADDRESS=http://ec2-3-211-58-180.compute-1.amazonaws.com:8090/auth/realms/pha/protocol/openid-connect/
       - SERVER_TITLE=Public Health Authority
       - ADMIN_TOKEN=admin

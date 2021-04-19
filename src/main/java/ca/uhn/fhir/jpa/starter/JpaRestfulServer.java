@@ -24,6 +24,7 @@ import ca.uhn.fhir.jpa.subscription.dbmatcher.DaoSubscriptionMatcher;
 import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
@@ -50,6 +51,7 @@ import org.mitre.hapifhir.SubscriptionInterceptor;
 import org.mitre.hapifhir.model.SubscriptionTopic;
 import org.mitre.hapifhir.model.ResourceTrigger;
 import org.mitre.hapifhir.model.ResourceTrigger.MethodCriteria;
+import org.mitre.hapifhir.search.BearerAuthSearchClient;
 import org.mitre.hapifhir.TopicListInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -244,10 +246,11 @@ public class JpaRestfulServer extends RestfulServer {
     /*
      * Add Backport Subscription interceptor
      */
-    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), subscriptionTopics);
+    IGenericClient client = this.getFhirContext().newRestfulGenericClient(HapiProperties.getServerAddress());
+    BearerAuthSearchClient searchClient = new BearerAuthSearchClient(System.getenv("ADMIN_TOKEN"), client);
+    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), searchClient, subscriptionTopics);
     this.registerInterceptor(subscriptionInterceptor);
 
-    SearchParamMatcher ol;
     /*
      * Add Topic List interceptor
      */

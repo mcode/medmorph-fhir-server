@@ -18,7 +18,9 @@ import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
 import ca.uhn.fhir.jpa.provider.r5.JpaConformanceProviderR5;
 import ca.uhn.fhir.jpa.provider.r5.JpaSystemProviderR5;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.searchparam.matcher.SearchParamMatcher;
 import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
+import ca.uhn.fhir.jpa.subscription.dbmatcher.DaoSubscriptionMatcher;
 import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -32,6 +34,7 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseValidatingInterceptor;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.hl7.fhir.r4.model.Bundle;
@@ -43,11 +46,18 @@ import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComp
 import org.mitre.hapifhir.BackendAuthorizationInterceptor;
 import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
 import org.mitre.hapifhir.ProcessMessageProvider;
+import org.mitre.hapifhir.SubscriptionInterceptor;
+import org.mitre.hapifhir.model.SubscriptionTopic;
+import org.mitre.hapifhir.model.ResourceTrigger;
+import org.mitre.hapifhir.model.ResourceTrigger.MethodCriteria;
+import org.mitre.hapifhir.TopicListInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.cors.CorsConfiguration;
 
 import javax.servlet.ServletException;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -223,6 +233,26 @@ public class JpaRestfulServer extends RestfulServer {
      */
     BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
     this.registerInterceptor(authorizationInterceptor);
+
+    /*
+     * Create Backport SubscriptionTopics
+     */
+    List<SubscriptionTopic> subscriptionTopics = new ArrayList<>();
+    ResourceTrigger resourceTrigger = new ResourceTrigger(ResourceType.Patient, Collections.singletonList(MethodCriteria.UPDATE));
+    subscriptionTopics.add(new SubscriptionTopic("subTop01", "demographic-change", "http://example.org/medmorph/subscriptiontopic/demographic-change", Collections.singletonList(resourceTrigger)));
+
+    /*
+     * Add Backport Subscription interceptor
+     */
+    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), subscriptionTopics);
+    this.registerInterceptor(subscriptionInterceptor);
+
+    SearchParamMatcher ol;
+    /*
+     * Add Topic List interceptor
+     */
+    TopicListInterceptor topicListInterceptor = new TopicListInterceptor(this.getFhirContext(), subscriptionTopics);
+    this.registerInterceptor(topicListInterceptor);
 
     /*
      * If you are hosting this server at a specific DNS name, the server will try to

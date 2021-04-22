@@ -45,7 +45,7 @@ import org.mitre.hapifhir.BackendAuthorizationInterceptor;
 import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
 import org.mitre.hapifhir.ProcessMessageProvider;
 import org.mitre.hapifhir.SubscriptionInterceptor;
-import org.mitre.hapifhir.search.BearerAuthSearchClient;
+import org.mitre.hapifhir.client.BearerAuthServerClient;
 import org.mitre.hapifhir.TopicListInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -233,8 +233,8 @@ public class JpaRestfulServer extends RestfulServer {
      * Add Backport Subscription interceptor
      */
     IGenericClient client = this.getFhirContext().newRestfulGenericClient(HapiProperties.getServerAddress());
-    BearerAuthSearchClient searchClient = new BearerAuthSearchClient(System.getenv("ADMIN_TOKEN"), client);
-    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), searchClient, MedmorphSubscriptionTopics.getAllTopics());
+    BearerAuthServerClient serverClient = new BearerAuthServerClient(System.getenv("ADMIN_TOKEN"), client);
+    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), serverClient, MedmorphSubscriptionTopics.getAllTopics());
     this.registerInterceptor(subscriptionInterceptor);
 
     /*

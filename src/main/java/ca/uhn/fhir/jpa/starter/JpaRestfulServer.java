@@ -22,6 +22,7 @@ import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
 import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
@@ -43,11 +44,15 @@ import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComp
 import org.mitre.hapifhir.BackendAuthorizationInterceptor;
 import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
 import org.mitre.hapifhir.ProcessMessageProvider;
+import org.mitre.hapifhir.SubscriptionInterceptor;
+import org.mitre.hapifhir.client.BearerAuthServerClient;
+import org.mitre.hapifhir.TopicListInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.cors.CorsConfiguration;
 
 import javax.servlet.ServletException;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -223,6 +228,20 @@ public class JpaRestfulServer extends RestfulServer {
      */
     BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
     this.registerInterceptor(authorizationInterceptor);
+
+    /*
+     * Add Backport Subscription interceptor
+     */
+    IGenericClient client = this.getFhirContext().newRestfulGenericClient(HapiProperties.getServerAddress());
+    BearerAuthServerClient serverClient = new BearerAuthServerClient(System.getenv("ADMIN_TOKEN"), client);
+    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), serverClient, MedmorphSubscriptionTopics.getAllTopics());
+    this.registerInterceptor(subscriptionInterceptor);
+
+    /*
+     * Add Topic List interceptor
+     */
+    TopicListInterceptor topicListInterceptor = new TopicListInterceptor(this.getFhirContext(), MedmorphSubscriptionTopics.getAllTopics());
+    this.registerInterceptor(topicListInterceptor);
 
     /*
      * If you are hosting this server at a specific DNS name, the server will try to

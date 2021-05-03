@@ -66,7 +66,7 @@ server's FHIR endpoint will be available at
 
 # Configuration
 
-Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, and `ADMIN_TOKEN`. These are set through enviornment variables of the same names. Using compose will automatically create all necessary servers.
+Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, `ADMIN_TOKEN`, `REQUIRE_AUTH`. These are set through environment variables of the same names. Using compose will automatically create all necessary servers.
 
 # Authorization
 

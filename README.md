@@ -4,9 +4,9 @@ This project is a FHIR server which is used for multiple actors (EHR and Knowled
 
 Note: Issues related to performance and Subscriptions were observed on HAPI 5.1.0
 
-# Running Locally
+## Running Locally
 
-## Docker
+### Docker
 
 The easiest way to run this server is to use docker. If using docker-for-windows or docker-for-mac, make sure the docker machine is allocated enough memory to run all three FHIR servers. The three containers together require approximately 2.5GB of memory.
 
@@ -14,7 +14,7 @@ By default, docker on windows/mac will only allocate 2GB of local memory for doc
 
 Then, run the following commands:
 
-```
+```sh
 ./build-docker-image.bat
 docker-compose up
 ```
@@ -23,14 +23,14 @@ This will create the `medmorph_fhir` image and spin up the `medmoprh_ehr` (on [h
 
 Alternatively the image can be built and specific instances run. First, clone this repository. Then, from the repository root run:
 
-```
+```sh
 docker build -t medmorph_fhir .
 ```
 
 This will build the docker image for the reference server. Once the image has
 been built, the server can be run with the following command:
 
-```
+```sh
 docker run -p 8080:8080 -e AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/ -e SERVER_ADDRESS=http://localhost:8080/fhir/ -e SERVER_TITLE=EHR medmorph_fhir
 ```
 
@@ -39,20 +39,21 @@ The server will then be browseable at
 server's FHIR endpoint will be available at
 [http://localhost:8080/fhir](http://localhost:8080/fhir)
 
-## Jetty
+### Jetty
 
 Alternatively the server can be run without Docker. When testing changes published to a local maven repository you must use this approach. This requires exporting the environment variables manually
 
-```
+```sh
 export SERVER_ADDRESS=http://localhost:8080/medmorph/fhir
 export AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
 export SERVER_TITLE=Medmorph
 export ADMIN_TOKEN=admin
+export REQUIRE_AUTH=false
 ```
 
 Then run the server using
 
-```
+```sh
 mvn jetty:run
 ```
 
@@ -64,17 +65,17 @@ The server will then be browseable at
 server's FHIR endpoint will be available at
 [http://localhost:8080/medmorph/fhir](http://localhost:8080/medmorph/fhir)
 
-# Configuration
+## Configuration
 
 Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, `ADMIN_TOKEN`, `REQUIRE_AUTH`. These are set through environment variables of the same names. Using compose will automatically create all necessary servers.
 
-# Authorization
+## Authorization
 
 This server is protected by the SMART Backend Authentication protocol. The admin token is `admin`. The OAuth URLS can be found at the `/metadata` or `/.well-known/smart-configuration` endpoints.
 
 Follow the [Register New Client](https://github.com/mcode/medmorph-fhir-server/wiki/Register-New-Client) wiki page to register a new client.
 
-# License
+## License
 
 Copyright 2021 The MITRE Corporation
 

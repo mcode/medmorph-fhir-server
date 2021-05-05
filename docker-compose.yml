@@ -12,7 +12,7 @@ services:
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
       - SERVER_TITLE=MedMorph EHR
       - ADMIN_TOKEN=admin
-      - REQUIRE_AUTH=false
+      - REQUIRE_AUTH=true
   knowledge_artifact:
     image: medmorph_fhir
     container_name: knowledge_artifact
@@ -24,7 +24,7 @@ services:
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
       - SERVER_TITLE=Knowledge Artifact Repository
       - ADMIN_TOKEN=admin
-      - REQUIRE_AUTH=false
+      - REQUIRE_AUTH=true
   public_health_authority:
     image: medmorph_fhir
     container_name: public_health_authority
@@ -36,4 +36,4 @@ services:
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/pha/protocol/openid-connect/
       - SERVER_TITLE=Public Health Authority
       - ADMIN_TOKEN=admin
-      - REQUIRE_AUTH=false
+      - REQUIRE_AUTH=true

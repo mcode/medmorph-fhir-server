@@ -48,7 +48,7 @@ export SERVER_ADDRESS=http://localhost:8080/medmorph/fhir
 export AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
 export SERVER_TITLE=Medmorph
 export ADMIN_TOKEN=admin
-export REQUIRE_AUTH=false
+export REQUIRE_AUTH=true
 ```
 
 Then run the server using

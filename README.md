@@ -12,11 +12,13 @@ The easiest way to run this server is to use docker. If using docker-for-windows
 
 By default, docker on windows/mac will only allocate 2GB of local memory for docker containers. To change this, use the Docker GUI, accessed through the docker toolbar icon or app, and navigate to preferences. Open the resources/advanced tab and increase the memory from 2GB to at least 3GB. This should provide the fhir servers with enough memory to run properly.
 
+Since the Docker container maps ports, it must be aware of it's actual host IP and not just reference `localhost`. The `docker-compose` file expects `LOCAL_IP` environment variable to be set. The command below illustrates how to do this in one line on a MITRE Mac. Note this may change from device to device.
+
 Then, run the following commands:
 
 ```sh
 ./build-docker-image.bat
-docker-compose up
+LOCAL_IP=$(ifconfig utun2 | grep inet | grep -v inet6 | awk '{print $2}') docker-compose up
 ```
 
 This will create the `medmorph_fhir` image and spin up the `medmoprh_ehr` (on [http://localhost:8180/fhir](http://localhost:8180/fhir)), `knowledge_artifact` (on [http://localhost:8190/fhir](http://localhost:8190/fhir)), and `public_health_authority` (on [http://localhost:8181/fhir](http://localhost:8181/fhir)) containers.

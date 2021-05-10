@@ -226,8 +226,11 @@ public class JpaRestfulServer extends RestfulServer {
     /*
      * Add Authorization interceptor
      */
-    BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
-    this.registerInterceptor(authorizationInterceptor);
+    String requireAuth = System.getenv("REQUIRE_AUTH");
+    if (requireAuth == null || !requireAuth.equals("false")) {
+      BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
+      this.registerInterceptor(authorizationInterceptor);
+    }
 
     /*
      * Add Backport Subscription interceptor

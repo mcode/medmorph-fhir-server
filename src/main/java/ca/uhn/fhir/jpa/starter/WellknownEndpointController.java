@@ -18,7 +18,8 @@ public class WellknownEndpointController {
     @GetMapping(path = "/smart-configuration", produces = {"application/json"})
     public String getWellKnownJson(HttpServletRequest theRequest) {
     	String yourTokenUrl = HapiProperties.getAuthServerTokenAddress();
+        String yourRegisterUrl = HapiProperties.getAuthServerRegistrationAddress();
     	
-    	return WellknownEndpointHelper.getWellKnownJson(yourTokenUrl);
+    	return WellknownEndpointHelper.getWellKnownJson(yourTokenUrl, yourRegisterUrl);
     }
 }

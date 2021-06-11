@@ -24,6 +24,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class HapiProperties {
   static final String ENABLE_INDEX_MISSING_FIELDS = "enable_index_missing_fields";
     static final String AUTH_SERVER_ADDRESS = "AUTH_SERVER_ADDRESS";
+    static final String AUTH_SERVER_REGISTER_ADDRESS = "AUTH_SERVER_REGISTER_ADDRESS";
     static final String AUTO_CREATE_PLACEHOLDER_REFERENCE_TARGETS = "auto_create_placeholder_reference_targets";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE = "enforce_referential_integrity_on_write";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_DELETE = "enforce_referential_integrity_on_delete";
@@ -260,6 +261,10 @@ public class HapiProperties {
 
     public static String getAuthServerCertsAddress() {
         return System.getenv(AUTH_SERVER_ADDRESS) + "certs";
+    }
+
+    public static String getAuthServerRegistrationAddress() {
+        return System.getenv(AUTH_SERVER_REGISTER_ADDRESS);
     }
 
     public static Integer getDefaultPageSize() {

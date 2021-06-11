@@ -148,7 +148,7 @@ public class JpaRestfulServer extends RestfulServer {
      */
     if (fhirVersion == FhirVersionEnum.R4) {
       SMARTServerCapabilityStatementProvider smartCSProvider =
-    			new SMARTServerCapabilityStatementProvider(HapiProperties.getAuthServerTokenAddress());
+    			new SMARTServerCapabilityStatementProvider(HapiProperties.getAuthServerTokenAddress(), HapiProperties.getAuthServerRegistrationAddress());
 
       final String serverTitle = title;
       

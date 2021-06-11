@@ -48,6 +48,7 @@ Alternatively the server can be run without Docker. When testing changes publish
 ```sh
 export SERVER_ADDRESS=http://localhost:8080/medmorph/fhir
 export AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
+export AUTH_SERVER_REGISTER_ADDRESS={'optional address for dynamic client registration'}
 export SERVER_TITLE=Medmorph
 export ADMIN_TOKEN=admin
 export REQUIRE_AUTH=true
@@ -69,7 +70,7 @@ server's FHIR endpoint will be available at
 
 ## Configuration
 
-Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, `ADMIN_TOKEN`, `REQUIRE_AUTH`. These are set through environment variables of the same names. Using compose will automatically create all necessary servers.
+Since this is a single repository and single docker image for multiple actors, each container should have its own properties. Right now the properties to configurate are `AUTH_SERVER_ADDRESS`, `AUTH_SERVER_REGISTER_ADDRESS`, `SERVER_ADDRESS`, `SERVER_TITLE`, `ADMIN_TOKEN`, `REQUIRE_AUTH`. These are set through environment variables of the same names. Using compose will automatically create all necessary servers.
 
 ## Authorization
 

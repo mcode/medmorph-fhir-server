@@ -5,6 +5,10 @@ target/
 # Data files
 synthea_data
 
+# Volume data - ignore sub directories but keep empty /data
+data/*
+!data/.gitkeep
+
 # Compiled class file
 *.class
 

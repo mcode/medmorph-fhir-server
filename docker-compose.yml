@@ -7,6 +7,8 @@ services:
     restart: on-failure
     ports:
       - "8180:8080"
+    volumes:
+      - ./data/ehr:/var/lib/jetty/target
     environment:
       - SERVER_ADDRESS=http://${LOCAL_IP}:8180/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/ehr/protocol/openid-connect/
@@ -19,6 +21,8 @@ services:
     restart: on-failure
     ports:
       - "8190:8080"
+    volumes:
+      - ./data/kar:/var/lib/jetty/target
     environment:
       - SERVER_ADDRESS=http://${LOCAL_IP}:8190/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/knowledgeartifact/protocol/openid-connect/
@@ -31,6 +35,8 @@ services:
     restart: on-failure
     ports:
       - "8181:8080"
+    volumes:
+      - ./data/pha:/var/lib/jetty/target
     environment:
       - SERVER_ADDRESS=http://${LOCAL_IP}:8181/fhir/
       - AUTH_SERVER_ADDRESS=http://moonshot-dev.mitre.org:8090/auth/realms/pha/protocol/openid-connect/

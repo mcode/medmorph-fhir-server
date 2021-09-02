@@ -34,6 +34,7 @@ import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import java.util.HashSet;
 import java.util.TreeSet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.MessageHeader;
@@ -43,6 +44,7 @@ import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent;
 import org.mitre.hapifhir.BackendAuthorizationInterceptor;
 import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
+import org.mitre.hapifhir.MedMorphToCIBMTR;
 import org.mitre.hapifhir.ProcessMessageProvider;
 import org.mitre.hapifhir.SubscriptionInterceptor;
 import org.mitre.hapifhir.client.BearerAuthServerClient;
@@ -101,15 +103,22 @@ public class JpaRestfulServer extends RestfulServer {
 
     setFhirContext(appCtx.getBean(FhirContext.class));
     ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (messageContext) -> {
-    	DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
+      DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
       Bundle bundle = messageContext.bundle;
       MessageHeader messageHeader = messageContext.messageHeader;
+      HttpServletRequest request = messageContext.request;
 
       IFhirResourceDao<Bundle> bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
       IFhirResourceDao<MessageHeader> messageDao = daoRegistry.getResourceDao(ResourceType.MessageHeader.name());
       bundleDao.create(bundle);
       messageDao.create(messageHeader);
 
+      // Pass report to CIBMTR translator
+      // Using 12001 as CCN until we figure out a way to extract it
+      MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR("http://pathways.mitre.org:4444/", "12001");
+      String authToken = request.getHeader("Authorization");
+      medmorphToCIBMTR.convert(bundle, authToken);
+    
       // NOTE: this line is the reason the provider doesn't do this itself
       // -- it doesn't know its own address (HapiProperties is JPA server only)
       String serverAddress = HapiProperties.getServerAddress();
@@ -122,7 +131,6 @@ public class JpaRestfulServer extends RestfulServer {
       header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
           .setCode(ResponseType.OK));
       response.addEntry().setResource(header);
-
       return response;
     });
 

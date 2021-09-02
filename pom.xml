@@ -251,6 +251,11 @@
         	<artifactId>r5-subscription-backport</artifactId>
         	<version>0.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.mitre.hapifhir</groupId>
+            <artifactId>medmorph-to-cibmtr</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <packaging>war</packaging>

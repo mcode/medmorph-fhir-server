@@ -100,32 +100,34 @@ public class JpaRestfulServer extends RestfulServer {
     }
 
     setFhirContext(appCtx.getBean(FhirContext.class));
-    
-    ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (reqBundle, reqHeader) -> {
+    ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (messageContext) -> {
     	DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
-    	
-        IFhirResourceDao<Bundle> bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
-        IFhirResourceDao<MessageHeader> messageDao = daoRegistry.getResourceDao(ResourceType.MessageHeader.name());
-        bundleDao.create(reqBundle);
-        messageDao.create(reqHeader);
-    	
-        // NOTE: this line is the reason the provider doesn't do this itself
-        // -- it doesn't know its own address (HapiProperties is JPA server only)
-        String serverAddress = HapiProperties.getServerAddress();
-        Bundle response = new Bundle();
-        response.setType(Bundle.BundleType.MESSAGE);
-        MessageHeader header = new MessageHeader();
-        header.addDestination().setEndpoint(reqHeader.getSource().getEndpoint());
-        header.setSource(new MessageHeader.MessageSourceComponent()
-            .setEndpoint(serverAddress + "$process-message"));
-        header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
-            .setCode(ResponseType.OK));
-        response.addEntry().setResource(header);
-        return response;
+      Bundle bundle = messageContext.bundle;
+      MessageHeader messageHeader = messageContext.messageHeader;
+
+      IFhirResourceDao<Bundle> bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
+      IFhirResourceDao<MessageHeader> messageDao = daoRegistry.getResourceDao(ResourceType.MessageHeader.name());
+      bundleDao.create(bundle);
+      messageDao.create(messageHeader);
+
+      // NOTE: this line is the reason the provider doesn't do this itself
+      // -- it doesn't know its own address (HapiProperties is JPA server only)
+      String serverAddress = HapiProperties.getServerAddress();
+      Bundle response = new Bundle();
+      response.setType(Bundle.BundleType.MESSAGE);
+      MessageHeader header = new MessageHeader();
+      header.addDestination().setEndpoint(messageHeader.getSource().getEndpoint());
+      header.setSource(new MessageHeader.MessageSourceComponent()
+          .setEndpoint(serverAddress + "$process-message"));
+      header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
+          .setCode(ResponseType.OK));
+      response.addEntry().setResource(header);
+
+      return response;
     });
-    
+
     registerProvider(pmp);
-    
+
     registerProviders(resourceProviders.createProviders());
     registerProvider(systemProvider);
 

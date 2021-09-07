@@ -52,6 +52,7 @@ export AUTH_SERVER_REGISTER_ADDRESS={'optional address for dynamic client regist
 export SERVER_TITLE=Medmorph
 export ADMIN_TOKEN=admin
 export REQUIRE_AUTH=true
+export CIBMTR_URL=http://pathways.mitre.org:4444/
 ```
 
 Then run the server using

@@ -115,7 +115,7 @@ public class JpaRestfulServer extends RestfulServer {
 
       // Pass report to CIBMTR translator
       // Using 12001 as CCN until we figure out a way to extract it
-      MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR("http://pathways.mitre.org:4444/", "12001");
+      MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(System.getenv("CIBMTR_URL"), "12001");
       String authToken = request.getHeader("Authorization");
       medmorphToCIBMTR.convert(bundle, authToken);
     

@@ -102,6 +102,7 @@ public class JpaRestfulServer extends RestfulServer {
     }
 
     setFhirContext(appCtx.getBean(FhirContext.class));
+    MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(System.getenv("CIBMTR_URL"));
     ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (messageContext) -> {
       DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
       Bundle bundle = messageContext.bundle;
@@ -114,10 +115,8 @@ public class JpaRestfulServer extends RestfulServer {
       messageDao.create(messageHeader);
 
       // Pass report to CIBMTR translator
-      // Using 12001 as CCN until we figure out a way to extract it
-      MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(System.getenv("CIBMTR_URL"), "12001");
       String authToken = request.getHeader("Authorization");
-      medmorphToCIBMTR.convert(bundle, authToken);
+      medmorphToCIBMTR.convert(bundle, messageHeader, authToken);
     
       // NOTE: this line is the reason the provider doesn't do this itself
       // -- it doesn't know its own address (HapiProperties is JPA server only)

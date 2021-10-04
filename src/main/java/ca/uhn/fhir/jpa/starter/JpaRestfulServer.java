@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent;
@@ -116,7 +117,7 @@ public class JpaRestfulServer extends RestfulServer {
 
       // Pass report to CIBMTR translator
       String authToken = request.getHeader("Authorization");
-      medmorphToCIBMTR.convert(bundle, messageHeader, authToken);
+      OperationOutcome operationOutcome = medmorphToCIBMTR.convert(bundle, messageHeader, authToken);
     
       // NOTE: this line is the reason the provider doesn't do this itself
       // -- it doesn't know its own address (HapiProperties is JPA server only)
@@ -126,10 +127,11 @@ public class JpaRestfulServer extends RestfulServer {
       MessageHeader header = new MessageHeader();
       header.addDestination().setEndpoint(messageHeader.getSource().getEndpoint());
       header.setSource(new MessageHeader.MessageSourceComponent()
-          .setEndpoint(serverAddress + "$process-message"));
+          .setEndpoint(serverAddress + "/$process-message"));
       header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
           .setCode(ResponseType.OK));
       response.addEntry().setResource(header);
+      if (operationOutcome != null) response.addEntry().setResource(operationOutcome);
       return response;
     });
 

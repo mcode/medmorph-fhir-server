@@ -67,20 +67,20 @@ public class MedmorphSubscriptionTopics {
         medicationChangeTriggers.add(updateMedicationAdministrationResourceTrigger);
 
         this.subscriptionTopics = new ArrayList<>();
-        this.subscriptionTopics.add(new SubscriptionTopic("encounter-change", "encounter-change", "http://example.org/medmorph/subscriptiontopic/encounter-change", encounterChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("diagnosis-change", "diagnosis-change", "http://example.org/medmorph/subscriptiontopic/diagnosis-change", diagnosisChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-diagnosis", "new-diagnosis", "http://example.org/medmorph/subscriptiontopic/new-diagnosis", newDiagnosisTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("medication-change", "medication-change", "http://example.org/medmorph/subscriptiontopic/medication-change", medicationChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-medication", "new-medication", "http://example.org/medmorph/subscriptiontopic/new-medication", newMedicationTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("labresult-change", "labresult-change", "http://example.org/medmorph/subscriptiontopic/labresult-change", labresultChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-labresult", "new-labresult", "http://example.org/medmorph/subscriptiontopic/new-labresult", newLabresultTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("order-change", "order-change", "http://example.org/medmorph/subscriptiontopic/order-change", orderChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-order", "new-order", "http://example.org/medmorph/subscriptiontopic/new-order", newOrderTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("procedure-change", "procedure-change", "http://example.org/medmorph/subscriptiontopic/procedure-change", procedureChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-procedure", "new-procedure", "http://example.org/medmorph/subscriptiontopic/new-procedure", newProcedureChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("immunization-change", "immunization-change", "http://example.org/medmorph/subscriptiontopic/immunization-change", immunizationChangeTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("new-immunization", "new-immunization", "http://example.org/medmorph/subscriptiontopic/new-immunization", newImmunizationTriggers));
-        this.subscriptionTopics.add(new SubscriptionTopic("demographic-change", "demographic-change", "http://example.org/medmorph/subscriptiontopic/demographic-change", demographicChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("encounter-change", "encounter-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/encounter-change", encounterChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("diagnosis-change", "diagnosis-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/diagnosis-change", diagnosisChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-diagnosis", "new-diagnosis", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-diagnosis", newDiagnosisTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("medication-change", "medication-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/medication-change", medicationChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-medication", "new-medication", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-medication", newMedicationTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("labresult-change", "labresult-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/labresult-change", labresultChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-labresult", "new-labresult", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-labresult", newLabresultTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("order-change", "order-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/order-change", orderChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-order", "new-order", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-order", newOrderTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("procedure-change", "procedure-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/procedure-change", procedureChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-procedure", "new-procedure", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-procedure", newProcedureChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("immunization-change", "immunization-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/immunization-change", immunizationChangeTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("new-immunization", "new-immunization", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/new-immunization", newImmunizationTriggers));
+        this.subscriptionTopics.add(new SubscriptionTopic("demographic-change", "demographic-change", "http://hl7.org/fhir/us/medmorph/SubscriptionTopic/demographic-change", demographicChangeTriggers));
     }
     
     public static List<SubscriptionTopic> getAllTopics() {

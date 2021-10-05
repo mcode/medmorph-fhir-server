@@ -49,6 +49,8 @@ import org.mitre.hapifhir.MedMorphToCIBMTR;
 import org.mitre.hapifhir.ProcessMessageProvider;
 import org.mitre.hapifhir.SubscriptionInterceptor;
 import org.mitre.hapifhir.client.BearerAuthServerClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.mitre.hapifhir.TopicListInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -62,6 +64,8 @@ import java.util.Set;
 
 public class JpaRestfulServer extends RestfulServer {
 
+  private final Logger logger = LoggerFactory.getLogger(JpaRestfulServer.class.getName());
+  
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -105,15 +109,10 @@ public class JpaRestfulServer extends RestfulServer {
     setFhirContext(appCtx.getBean(FhirContext.class));
     MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(System.getenv("CIBMTR_URL"));
     ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (messageContext) -> {
-      DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
       Bundle bundle = messageContext.bundle;
+      logger.info("Received message at $process-message endpoint -- bundle id: " + bundle.getId());
       MessageHeader messageHeader = messageContext.messageHeader;
       HttpServletRequest request = messageContext.request;
-
-      IFhirResourceDao<Bundle> bundleDao = daoRegistry.getResourceDao(ResourceType.Bundle.name());
-      IFhirResourceDao<MessageHeader> messageDao = daoRegistry.getResourceDao(ResourceType.MessageHeader.name());
-      bundleDao.create(bundle);
-      messageDao.create(messageHeader);
 
       // Pass report to CIBMTR translator
       String authToken = request.getHeader("Authorization");
@@ -128,8 +127,12 @@ public class JpaRestfulServer extends RestfulServer {
       header.addDestination().setEndpoint(messageHeader.getSource().getEndpoint());
       header.setSource(new MessageHeader.MessageSourceComponent()
           .setEndpoint(serverAddress + "/$process-message"));
+
+      // TODO: expand errors to distinguish transient vs fatal error
+      ResponseType responseTypeCode = operationOutcome == null ? ResponseType.OK : ResponseType.FATALERROR;
+      logger.info("Returning response from $process-message, bundle id: " + bundle.getId() + " -- response code: " + responseTypeCode);
       header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
-          .setCode(ResponseType.OK));
+          .setCode(responseTypeCode));
       response.addEntry().setResource(header);
       if (operationOutcome != null) response.addEntry().setResource(operationOutcome);
       return response;

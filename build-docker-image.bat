@@ -1,1 +1,1 @@
-docker build -t medmorph_fhir .
+docker build -t medmorph_fhir_cibmtr .

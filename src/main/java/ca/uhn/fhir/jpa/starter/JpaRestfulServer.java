@@ -107,7 +107,9 @@ public class JpaRestfulServer extends RestfulServer {
     }
 
     setFhirContext(appCtx.getBean(FhirContext.class));
-    MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(System.getenv("CIBMTR_URL"));
+    String cibmtrUrl = System.getenv("CIBMTR_URL");
+    MedMorphToCIBMTR medmorphToCIBMTR = new MedMorphToCIBMTR(cibmtrUrl);
+    logger.info("CIBMTR translator started and pointing to " + cibmtrUrl);
     ProcessMessageProvider pmp = new ProcessMessageProvider(this.getFhirContext(), (messageContext) -> {
       Bundle bundle = messageContext.bundle;
       logger.info("Received message at $process-message endpoint -- bundle id: " + bundle.getId());

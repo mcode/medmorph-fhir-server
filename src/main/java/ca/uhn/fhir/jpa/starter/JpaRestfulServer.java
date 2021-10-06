@@ -1,5 +1,33 @@
 package ca.uhn.fhir.jpa.starter;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent;
+import org.hl7.fhir.r4.model.MessageHeader;
+import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
+import org.hl7.fhir.r4.model.OperationOutcome;
+import org.mitre.hapifhir.BackendAuthorizationInterceptor;
+import org.mitre.hapifhir.MedMorphToCIBMTR;
+import org.mitre.hapifhir.ProcessMessageProvider;
+import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
+import org.mitre.hapifhir.SubscriptionInterceptor;
+import org.mitre.hapifhir.TopicListInterceptor;
+import org.mitre.hapifhir.client.BearerAuthServerClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.cors.CorsConfiguration;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
@@ -8,7 +36,6 @@ import ca.uhn.fhir.jpa.binstore.BinaryStorageInterceptor;
 import ca.uhn.fhir.jpa.bulk.BulkDataExportProvider;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
 import ca.uhn.fhir.jpa.dao.DaoRegistry;
-import ca.uhn.fhir.jpa.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
 import ca.uhn.fhir.jpa.provider.GraphQLProvider;
@@ -32,35 +59,6 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.ResponseValidatingInterceptor;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
-import java.util.HashSet;
-import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
-
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
-import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent;
-import org.mitre.hapifhir.BackendAuthorizationInterceptor;
-import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
-import org.mitre.hapifhir.MedMorphToCIBMTR;
-import org.mitre.hapifhir.ProcessMessageProvider;
-import org.mitre.hapifhir.SubscriptionInterceptor;
-import org.mitre.hapifhir.client.BearerAuthServerClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.mitre.hapifhir.TopicListInterceptor;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.cors.CorsConfiguration;
-
-import javax.servlet.ServletException;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 
 public class JpaRestfulServer extends RestfulServer {
 
@@ -130,13 +128,13 @@ public class JpaRestfulServer extends RestfulServer {
       header.setSource(new MessageHeader.MessageSourceComponent()
           .setEndpoint(serverAddress + "/$process-message"));
 
-      // TODO: expand errors to distinguish transient vs fatal error
-      ResponseType responseTypeCode = operationOutcome == null ? ResponseType.OK : ResponseType.FATALERROR;
+
+      ResponseType responseTypeCode = operationOutcome.getIssueFirstRep().getSeverity().equals(OperationOutcome.IssueSeverity.INFORMATION) ? ResponseType.OK : ResponseType.FATALERROR;
       logger.info("Returning response from $process-message, bundle id: " + bundle.getId() + " -- response code: " + responseTypeCode);
       header.setResponse(new MessageHeader.MessageHeaderResponseComponent()
           .setCode(responseTypeCode));
       response.addEntry().setResource(header);
-      if (operationOutcome != null) response.addEntry().setResource(operationOutcome);
+      response.addEntry().setResource(operationOutcome);
       return response;
     });
 

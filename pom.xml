@@ -254,7 +254,7 @@
         <dependency>
             <groupId>org.mitre.hapifhir</groupId>
             <artifactId>medmorph-to-cibmtr</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
     </dependencies>
 

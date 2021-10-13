@@ -15,13 +15,9 @@ import org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComp
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.MessageHeader.ResponseType;
 import org.hl7.fhir.r4.model.OperationOutcome;
-import org.mitre.hapifhir.BackendAuthorizationInterceptor;
 import org.mitre.hapifhir.MedMorphToCIBMTR;
 import org.mitre.hapifhir.ProcessMessageProvider;
 import org.mitre.hapifhir.SMARTServerCapabilityStatementProvider;
-import org.mitre.hapifhir.SubscriptionInterceptor;
-import org.mitre.hapifhir.TopicListInterceptor;
-import org.mitre.hapifhir.client.BearerAuthServerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +45,6 @@ import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
 import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
@@ -237,28 +232,6 @@ public class JpaRestfulServer extends RestfulServer {
     loggingInterceptor.setLogExceptions(HapiProperties.getLoggerLogExceptions());
     this.registerInterceptor(loggingInterceptor);
 
-    /*
-     * Add Authorization interceptor
-     */
-    String requireAuth = System.getenv("REQUIRE_AUTH");
-    if (requireAuth == null || !requireAuth.equals("false")) {
-      BackendAuthorizationInterceptor authorizationInterceptor = new BackendAuthorizationInterceptor(HapiProperties.getAuthServerCertsAddress());
-      this.registerInterceptor(authorizationInterceptor);
-    }
-
-    /*
-     * Add Backport Subscription interceptor
-     */
-    IGenericClient client = this.getFhirContext().newRestfulGenericClient(HapiProperties.getServerAddress());
-    BearerAuthServerClient serverClient = new BearerAuthServerClient(System.getenv("ADMIN_TOKEN"), client);
-    SubscriptionInterceptor subscriptionInterceptor = new SubscriptionInterceptor(HapiProperties.getServerAddress(), this.getFhirContext(), serverClient, MedmorphSubscriptionTopics.getAllTopics());
-    this.registerInterceptor(subscriptionInterceptor);
-
-    /*
-     * Add Topic List interceptor
-     */
-    TopicListInterceptor topicListInterceptor = new TopicListInterceptor(this.getFhirContext(), MedmorphSubscriptionTopics.getAllTopics());
-    this.registerInterceptor(topicListInterceptor);
 
     /*
      * If you are hosting this server at a specific DNS name, the server will try to
